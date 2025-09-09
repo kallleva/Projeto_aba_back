@@ -10,6 +10,10 @@ from .plano_terapeutico import PlanoTerapeutico
 from .meta_terapeutica import MetaTerapeutica, StatusMetaEnum
 from .checklist_diario import ChecklistDiario
 from .usuario import Usuario, TipoUsuarioEnum
+from .formulario import Formulario
+from .pergunta import Pergunta
+from .checklist_respostas import ChecklistResposta
+from .checklist_diario import ChecklistDiario
 
 # Exportar para facilitar importações
 __all__ = [
@@ -20,6 +24,10 @@ __all__ = [
     'MetaTerapeutica',
     'ChecklistDiario',
     'Usuario',
+    'Formulario',     
+    'Pergunta',  
+    'ChecklistResposta',
+    'ChecklistDiario',      # <--- adicione esta linha
     'DiagnosticoEnum',
     'StatusMetaEnum',
     'TipoUsuarioEnum'

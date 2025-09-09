@@ -1,10 +1,10 @@
 import os
 import sys
-# DON'T CHANGE THIS !!!
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
+import io
+import logging
 from flask import Flask, send_from_directory
 from flask_cors import CORS
+from flasgger import Swagger
 from src.models import db
 from src.routes.user import user_bp
 from src.routes.paciente import paciente_bp
@@ -14,48 +14,86 @@ from src.routes.meta_terapeutica import meta_terapeutica_bp
 from src.routes.checklist_diario import checklist_diario_bp
 from src.routes.relatorios import relatorios_bp
 from src.routes.auth import auth_bp
+from src.routes.pergunta import pergunta_bp
+from src.routes.formulario import formulario_bp
 
+# Forçar UTF-8 no stdout/stderr
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
+# Adicionar diretório raiz ao sys.path
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+# Inicialização do Flask
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
-app.config['SECRET_KEY'] = 'asdf#FGSgvasgf$5$WGT'
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
 
-# Configurar CORS para permitir requisições do frontend
+# Configuração CORS
 CORS(app)
 
-# Registrar blueprints
-app.register_blueprint(user_bp, url_prefix='/api')
-app.register_blueprint(paciente_bp, url_prefix='/api')
-app.register_blueprint(profissional_bp, url_prefix='/api')
-app.register_blueprint(plano_terapeutico_bp, url_prefix='/api')
-app.register_blueprint(meta_terapeutica_bp, url_prefix='/api')
-app.register_blueprint(checklist_diario_bp, url_prefix='/api')
-app.register_blueprint(relatorios_bp, url_prefix='/api')
-app.register_blueprint(auth_bp, url_prefix='/api')
+# Configuração do banco PostgreSQL
+DB_USER = os.environ.get('DB_USER', 'postgres')
+DB_PASS = os.environ.get('DB_PASS', 'postgres')
+DB_NAME = os.environ.get('DB_NAME', 'aba_postgres')
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
 
-# Configuração do banco de dados
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Inicializa SQLAlchemy
 db.init_app(app)
 
-# Criar tabelas
-with app.app_context():
-    db.create_all()
+# Configuração Swagger
+swagger = Swagger(app, template={
+    "swagger": "2.0",
+    "info": {
+        "title": "API Terapêutica",
+        "description": "Documentação da API para formulários, pacientes, profissionais e autenticação.",
+        "version": "1.0.0"
+    },
+    "basePath": "/api",
+})
 
+# Registrar Blueprints
+blueprints = [
+    user_bp, paciente_bp, profissional_bp, plano_terapeutico_bp,
+    meta_terapeutica_bp, checklist_diario_bp, relatorios_bp,
+    auth_bp, pergunta_bp, formulario_bp
+]
+
+for bp in blueprints:
+    app.register_blueprint(bp, url_prefix='/api')
+
+# Criar tabelas (apenas em desenvolvimento)
+with app.app_context():
+    try:
+        db.create_all()
+        print("Tabelas criadas com sucesso.")
+    except Exception as e:
+        print("Erro ao criar tabelas:", e)
+
+# Rota de teste
+@app.route('/api/hello', methods=['GET'])
+def hello():
+    return {"mensagem": "Olá, mundo!"}
+
+# Servir frontend (SPA)
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
-    static_folder_path = app.static_folder
-    if static_folder_path is None:
-            return "Static folder not configured", 404
-
-    if path != "" and os.path.exists(os.path.join(static_folder_path, path)):
-        return send_from_directory(static_folder_path, path)
-    else:
-        index_path = os.path.join(static_folder_path, 'index.html')
-        if os.path.exists(index_path):
-            return send_from_directory(static_folder_path, 'index.html')
-        else:
-            return "index.html not found", 404
-
+    static_folder = app.static_folder
+    requested_path = os.path.join(static_folder, path)
+    
+    if path != "" and os.path.exists(requested_path):
+        return send_from_directory(static_folder, path)
+    
+    index_path = os.path.join(static_folder, 'index.html')
+    if os.path.exists(index_path):
+        return send_from_directory(static_folder, 'index.html')
+    
+    return "index.html not found", 404
 
 if __name__ == '__main__':
+    logging.basicConfig(level=logging.DEBUG)
+    logging.debug(f"Tentando conectar ao banco: {DB_USER}@{DB_HOST}:{DB_NAME}")
     app.run(host='0.0.0.0', port=5000, debug=True)

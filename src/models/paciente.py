@@ -9,20 +9,25 @@ class DiagnosticoEnum(Enum):
 
 class Paciente(db.Model):
     __tablename__ = 'pacientes'
-    
+
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String(100), nullable=False)
     data_nascimento = db.Column(db.Date, nullable=False)
     responsavel = db.Column(db.String(100), nullable=False)
     contato = db.Column(db.String(50), nullable=False)
     diagnostico = db.Column(db.Enum(DiagnosticoEnum), nullable=False)
-    
-    # Relacionamentos
-    planos_terapeuticos = db.relationship('PlanoTerapeutico', backref='paciente_ref', lazy=True, cascade='all, delete-orphan')
-    
+
+    # Relacionamento
+    planos_terapeuticos = db.relationship(
+        'PlanoTerapeutico',
+        back_populates='paciente',
+        lazy=True,
+        cascade='all, delete-orphan'
+    )
+
     def __repr__(self):
         return f'<Paciente {self.nome}>'
-    
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -32,11 +37,7 @@ class Paciente(db.Model):
             'contato': self.contato,
             'diagnostico': self.diagnostico.value if self.diagnostico else None
         }
-    
-    def calcular_idade(self):
-        """Calcula a idade do paciente em anos"""
-        if self.data_nascimento:
-            hoje = date.today()
-            return hoje.year - self.data_nascimento.year - ((hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day))
-        return None
 
+    def calcular_idade(self):
+        hoje = date.today()
+        return hoje.year - self.data_nascimento.year - ((hoje.month, hoje.day) < (self.data_nascimento.month, self.data_nascimento.day))

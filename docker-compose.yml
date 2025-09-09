@@ -1,0 +1,19 @@
+services:
+  db:
+    image: postgres:15
+    platform: linux/amd64   # <--- esta linha força a arquitetura
+    container_name: aba_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: aba_user
+      POSTGRES_PASSWORD: aba_pass123
+      POSTGRES_DB: aba_postgres
+      LANG: C.UTF-8
+      LC_ALL: C.UTF-8
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:

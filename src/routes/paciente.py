@@ -6,29 +6,106 @@ paciente_bp = Blueprint('paciente', __name__)
 
 @paciente_bp.route('/pacientes', methods=['GET'])
 def listar_pacientes():
-    """Lista todos os pacientes"""
+    """
+    Lista todos os pacientes
+    ---
+    tags:
+      - Pacientes
+    responses:
+      200:
+        description: Lista de pacientes
+        schema:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              nome:
+                type: string
+              data_nascimento:
+                type: string
+              responsavel:
+                type: string
+              contato:
+                type: string
+              diagnostico:
+                type: string
+    """
     try:
         pacientes = Paciente.query.all()
         return jsonify([paciente.to_dict() for paciente in pacientes]), 200
     except Exception as e:
         return jsonify({'erro': str(e)}), 500
 
+
 @paciente_bp.route('/pacientes/<int:paciente_id>', methods=['GET'])
 def obter_paciente(paciente_id):
-    """Obtém um paciente específico"""
+    """
+    Obtém um paciente específico
+    ---
+    tags:
+      - Pacientes
+    parameters:
+      - name: paciente_id
+        in: path
+        type: integer
+        required: true
+        description: ID do paciente
+    responses:
+      200:
+        description: Paciente encontrado
+      404:
+        description: Paciente não encontrado
+    """
     try:
         paciente = Paciente.query.get_or_404(paciente_id)
         return jsonify(paciente.to_dict()), 200
     except Exception as e:
         return jsonify({'erro': str(e)}), 500
 
+
 @paciente_bp.route('/pacientes', methods=['POST'])
 def criar_paciente():
-    """Cria um novo paciente"""
+    """
+    Cria um novo paciente
+    ---
+    tags:
+      - Pacientes
+    parameters:
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          required:
+            - nome
+            - data_nascimento
+            - responsavel
+            - contato
+            - diagnostico
+          properties:
+            nome:
+              type: string
+            data_nascimento:
+              type: string
+              format: date
+            responsavel:
+              type: string
+            contato:
+              type: string
+            diagnostico:
+              type: string
+              enum: [AUTISMO, DOWNS, ADHD]  # ajuste conforme DiagnosticoEnum
+    responses:
+      201:
+        description: Paciente criado com sucesso
+      400:
+        description: Erro de validação
+    """
     try:
         dados = request.get_json()
         
-        # Validações
         if not dados.get('nome'):
             return jsonify({'erro': 'Nome é obrigatório'}), 400
         if not dados.get('data_nascimento'):
@@ -40,19 +117,16 @@ def criar_paciente():
         if not dados.get('diagnostico'):
             return jsonify({'erro': 'Diagnóstico é obrigatório'}), 400
         
-        # Validar diagnóstico
         try:
             diagnostico = DiagnosticoEnum(dados['diagnostico'])
         except ValueError:
             return jsonify({'erro': 'Diagnóstico inválido'}), 400
         
-        # Validar data de nascimento
         try:
             data_nascimento = datetime.strptime(dados['data_nascimento'], '%Y-%m-%d').date()
         except ValueError:
             return jsonify({'erro': 'Formato de data inválido. Use YYYY-MM-DD'}), 400
         
-        # Criar paciente
         paciente = Paciente(
             nome=dados['nome'],
             data_nascimento=data_nascimento,
@@ -70,14 +144,49 @@ def criar_paciente():
         db.session.rollback()
         return jsonify({'erro': str(e)}), 500
 
+
 @paciente_bp.route('/pacientes/<int:paciente_id>', methods=['PUT'])
 def atualizar_paciente(paciente_id):
-    """Atualiza um paciente existente"""
+    """
+    Atualiza um paciente existente
+    ---
+    tags:
+      - Pacientes
+    parameters:
+      - name: paciente_id
+        in: path
+        type: integer
+        required: true
+      - in: body
+        name: body
+        required: true
+        schema:
+          type: object
+          properties:
+            nome:
+              type: string
+            data_nascimento:
+              type: string
+              format: date
+            responsavel:
+              type: string
+            contato:
+              type: string
+            diagnostico:
+              type: string
+              enum: [AUTISMO, DOWNS, ADHD]  # ajuste conforme DiagnosticoEnum
+    responses:
+      200:
+        description: Paciente atualizado
+      400:
+        description: Erro de validação
+      404:
+        description: Paciente não encontrado
+    """
     try:
         paciente = Paciente.query.get_or_404(paciente_id)
         dados = request.get_json()
         
-        # Atualizar campos se fornecidos
         if 'nome' in dados:
             paciente.nome = dados['nome']
         if 'data_nascimento' in dados:
@@ -102,9 +211,25 @@ def atualizar_paciente(paciente_id):
         db.session.rollback()
         return jsonify({'erro': str(e)}), 500
 
+
 @paciente_bp.route('/pacientes/<int:paciente_id>', methods=['DELETE'])
 def deletar_paciente(paciente_id):
-    """Deleta um paciente"""
+    """
+    Deleta um paciente
+    ---
+    tags:
+      - Pacientes
+    parameters:
+      - name: paciente_id
+        in: path
+        type: integer
+        required: true
+    responses:
+      200:
+        description: Paciente deletado com sucesso
+      404:
+        description: Paciente não encontrado
+    """
     try:
         paciente = Paciente.query.get_or_404(paciente_id)
         db.session.delete(paciente)
@@ -113,4 +238,3 @@ def deletar_paciente(paciente_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'erro': str(e)}), 500
-
