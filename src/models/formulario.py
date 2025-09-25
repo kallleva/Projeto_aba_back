@@ -1,5 +1,6 @@
 from datetime import datetime
 from . import db
+from .meta_terapeutica import meta_formulario
 
 class Formulario(db.Model):
     __tablename__ = "formularios"
@@ -11,10 +12,15 @@ class Formulario(db.Model):
     criado_em = db.Column(db.DateTime, default=datetime.utcnow)
     atualizado_em = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relacionamento com MetaTerapeutica
-    meta_id = db.Column(db.Integer, db.ForeignKey('metas_terapeuticas.id'), nullable=True)
-
     perguntas = db.relationship("Pergunta", backref="formulario", cascade="all, delete-orphan")
+
+    # Relacionamento Many-to-Many com MetaTerapeutica
+    metas = db.relationship(
+        "MetaTerapeutica",
+        secondary=meta_formulario,
+        back_populates="formularios",
+        lazy="subquery"
+    )
 
     def to_dict(self):
         return {

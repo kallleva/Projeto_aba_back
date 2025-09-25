@@ -2,6 +2,13 @@ from datetime import date
 from enum import Enum
 from . import db
 
+# Tabela de associação Many-to-Many entre MetaTerapeutica e Formulario
+meta_formulario = db.Table(
+    "meta_formulario",
+    db.Column("meta_id", db.Integer, db.ForeignKey("metas_terapeuticas.id"), primary_key=True),
+    db.Column("formulario_id", db.Integer, db.ForeignKey("formularios.id"), primary_key=True)
+)
+
 class StatusMetaEnum(Enum):
     EM_ANDAMENTO = "EmAndamento"
     CONCLUIDA = "Concluida"
@@ -16,25 +23,19 @@ class MetaTerapeutica(db.Model):
     data_previsao_termino = db.Column(db.Date, nullable=False)
     status = db.Column(db.Enum(StatusMetaEnum), nullable=False, default=StatusMetaEnum.EM_ANDAMENTO)
 
-    # Relacionamentos
+    # Relacionamento com plano
     plano = db.relationship('PlanoTerapeutico', back_populates='metas_terapeuticas')
-    checklists_diarios = db.relationship(
-        'ChecklistDiario',
-        back_populates='meta',
-        lazy=True,
-        cascade='all, delete-orphan'
-    )
 
-    # Relacionamento com múltiplos formulários
+    # Relacionamento com checklist diário
+    checklists_diarios = db.relationship('ChecklistDiario', back_populates='meta', cascade='all, delete-orphan')
+
+    # Relacionamento Many-to-Many com Formulario
     formularios = db.relationship(
-        'Formulario',
-        backref='meta',
-        lazy=True,
-        cascade='all, delete-orphan'
+        "Formulario",
+        secondary=meta_formulario,
+        back_populates="metas",
+        lazy="subquery"
     )
-
-    def __repr__(self):
-        return f'<MetaTerapeutica {self.id}>'
 
     def to_dict(self):
         return {

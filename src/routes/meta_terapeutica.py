@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from datetime import datetime
+from datetime import datetime, date
 from src.models import db, MetaTerapeutica, PlanoTerapeutico, StatusMetaEnum, Formulario
 
 meta_terapeutica_bp = Blueprint('meta_terapeutica', __name__)
@@ -16,7 +16,6 @@ def listar_metas():
     except Exception as e:
         return jsonify({'erro': str(e)}), 500
 
-
 @meta_terapeutica_bp.route('/metas-terapeuticas/<int:meta_id>', methods=['GET'])
 def obter_meta(meta_id):
     try:
@@ -25,32 +24,10 @@ def obter_meta(meta_id):
     except Exception as e:
         return jsonify({'erro': str(e)}), 500
 
-
 @meta_terapeutica_bp.route('/metas-terapeuticas/plano/<int:plano_id>', methods=['GET'])
 def listar_metas_por_plano(plano_id):
     try:
         metas = MetaTerapeutica.query.filter_by(plano_id=plano_id).all()
-        return jsonify([meta.to_dict() for meta in metas]), 200
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-
-@meta_terapeutica_bp.route('/metas-terapeuticas/ativas', methods=['GET'])
-def listar_metas_ativas():
-    try:
-        metas = MetaTerapeutica.query.filter_by(status=StatusMetaEnum.EM_ANDAMENTO).all()
-        return jsonify([meta.to_dict() for meta in metas]), 200
-    except Exception as e:
-        return jsonify({'erro': str(e)}), 500
-
-
-@meta_terapeutica_bp.route('/metas-terapeuticas/paciente/<int:paciente_id>/ativas', methods=['GET'])
-def listar_metas_ativas_por_paciente(paciente_id):
-    try:
-        metas = db.session.query(MetaTerapeutica).join(PlanoTerapeutico).filter(
-            PlanoTerapeutico.paciente_id == paciente_id,
-            MetaTerapeutica.status == StatusMetaEnum.EM_ANDAMENTO
-        ).all()
         return jsonify([meta.to_dict() for meta in metas]), 200
     except Exception as e:
         return jsonify({'erro': str(e)}), 500
@@ -69,7 +46,6 @@ def criar_meta():
             if not dados.get(campo):
                 return jsonify({'erro': f'{campo} é obrigatório'}), 400
 
-        # Verificar plano
         plano = PlanoTerapeutico.query.get(dados['plano_id'])
         if not plano:
             return jsonify({'erro': 'Plano terapêutico não encontrado'}), 404
@@ -101,15 +77,11 @@ def criar_meta():
             status=status
         )
 
-        # Criar formulário se enviado
-        if dados.get('formulario'):
-            f = dados['formulario']
-            formulario = Formulario(
-                nome=f.get('nome'),
-                descricao=f.get('descricao')
-            )
-            meta.formulario = formulario
-            db.session.add(formulario)
+        # Vincular múltiplos formulários existentes
+        formulario_ids = dados.get('formularios', [])
+        if formulario_ids:
+            formularios = Formulario.query.filter(Formulario.id.in_(formulario_ids)).all()
+            meta.formularios = formularios
 
         db.session.add(meta)
         db.session.commit()
@@ -130,14 +102,12 @@ def atualizar_meta(meta_id):
         meta = MetaTerapeutica.query.get_or_404(meta_id)
         dados = request.get_json()
 
-        # Plano
         if 'plano_id' in dados:
             plano = PlanoTerapeutico.query.get(dados['plano_id'])
             if not plano:
                 return jsonify({'erro': 'Plano terapêutico não encontrado'}), 404
             meta.plano_id = dados['plano_id']
 
-        # Campos
         if 'descricao' in dados:
             meta.descricao = dados['descricao']
 
@@ -162,19 +132,11 @@ def atualizar_meta(meta_id):
             except ValueError:
                 return jsonify({'erro': 'Status inválido'}), 400
 
-        # Atualizar formulário
-        if 'formulario' in dados:
-            f = dados['formulario']
-            if meta.formulario:
-                meta.formulario.nome = f.get('nome', meta.formulario.nome)
-                meta.formulario.descricao = f.get('descricao', meta.formulario.descricao)
-            else:
-                formulario = Formulario(
-                    nome=f.get('nome'),
-                    descricao=f.get('descricao')
-                )
-                meta.formulario = formulario
-                db.session.add(formulario)
+        # Atualizar múltiplos formulários
+        if 'formularios' in dados:
+            formulario_ids = dados['formularios']
+            formularios = Formulario.query.filter(Formulario.id.in_(formulario_ids)).all()
+            meta.formularios = formularios
 
         db.session.commit()
         return jsonify(meta.to_dict()), 200
