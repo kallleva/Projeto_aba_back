@@ -142,12 +142,14 @@ def criar_formulario():
     return jsonify(form.to_dict()), 201
 
 
+
+
 # Atualizar
 @formulario_bp.route("/formularios/<int:id>", methods=["PUT"])
 def atualizar_formulario(id):
     """
     Atualiza um formulário existente
-    ---
+    --- 
     tags:
       - Formulários
     parameters:
@@ -172,6 +174,8 @@ def atualizar_formulario(id):
               items:
                 type: object
                 properties:
+                  id:
+                    type: integer
                   texto:
                     type: string
                   tipo:
@@ -191,22 +195,30 @@ def atualizar_formulario(id):
     form.descricao = dados.get("descricao", form.descricao)
     form.categoria = dados.get("categoria", form.categoria)
 
-    # Atualizar perguntas: apaga e recria
-    Pergunta.query.filter_by(formulario_id=form.id).delete()
-    db.session.flush()
-
+    # Atualizar perguntas sem apagar as antigas
     for i, p in enumerate(dados.get("perguntas", []), start=1):
-        pergunta = Pergunta(
-            texto=p["texto"],
-            tipo=p.get("tipo", "texto"),
-            obrigatoria=p.get("obrigatoria", False),
-            ordem=i,
-            formulario_id=form.id
-        )
-        db.session.add(pergunta)
+        if "id" in p and p["id"]:
+            # Atualiza pergunta existente
+            pergunta = Pergunta.query.filter_by(id=p["id"], formulario_id=form.id).first()
+            if pergunta:
+                pergunta.texto = p["texto"]
+                pergunta.tipo = p.get("tipo", "texto")
+                pergunta.obrigatoria = p.get("obrigatoria", False)
+                pergunta.ordem = i
+        else:
+            # Cria nova pergunta
+            pergunta = Pergunta(
+                texto=p["texto"],
+                tipo=p.get("tipo", "texto"),
+                obrigatoria=p.get("obrigatoria", False),
+                ordem=i,
+                formulario_id=form.id
+            )
+            db.session.add(pergunta)
 
     db.session.commit()
     return jsonify(form.to_dict()), 200
+
 
 
 # Deletar

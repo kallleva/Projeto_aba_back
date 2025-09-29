@@ -2,7 +2,7 @@ import os
 import sys
 import io
 import logging
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS
 from flasgger import Swagger
 from src.models import db
@@ -28,10 +28,19 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
 
+# -------------------------
 # Configuração CORS
-CORS(app)
+# -------------------------
+CORS(
+    app,
+    resources={r"/api/*": {"origins": "http://localhost:5173"}},
+    supports_credentials=True,
+    methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"]
+)
 
+# -------------------------
 # Configuração do banco PostgreSQL
+# -------------------------
 DB_USER = os.environ.get('DB_USER', 'postgres')
 DB_PASS = os.environ.get('DB_PASS', 'postgres')
 DB_NAME = os.environ.get('DB_NAME', 'aba_postgres')
@@ -43,7 +52,9 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 # Inicializa SQLAlchemy
 db.init_app(app)
 
+# -------------------------
 # Configuração Swagger
+# -------------------------
 swagger = Swagger(app, template={
     "swagger": "2.0",
     "info": {
@@ -54,7 +65,9 @@ swagger = Swagger(app, template={
     "basePath": "/api",
 })
 
+# -------------------------
 # Registrar Blueprints
+# -------------------------
 blueprints = [
     user_bp, paciente_bp, profissional_bp, plano_terapeutico_bp,
     meta_terapeutica_bp, checklist_diario_bp, relatorios_bp,
@@ -64,7 +77,9 @@ blueprints = [
 for bp in blueprints:
     app.register_blueprint(bp, url_prefix='/api')
 
+# -------------------------
 # Criar tabelas (apenas em desenvolvimento)
+# -------------------------
 with app.app_context():
     try:
         db.create_all()
@@ -72,12 +87,16 @@ with app.app_context():
     except Exception as e:
         print("Erro ao criar tabelas:", e)
 
+# -------------------------
 # Rota de teste
+# -------------------------
 @app.route('/api/hello', methods=['GET'])
 def hello():
     return {"mensagem": "Olá, mundo!"}
 
+# -------------------------
 # Servir frontend (SPA)
+# -------------------------
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve(path):
@@ -93,6 +112,23 @@ def serve(path):
     
     return "index.html not found", 404
 
+# -------------------------
+# Endpoint de exemplo PUT com logging de payload
+# -------------------------
+@app.route('/api/test-put/<int:id>', methods=['PUT'])
+def test_put(id):
+    try:
+        data = request.json
+        print(f"Payload recebido para update {id}: {data}")
+        # Aqui você pode chamar sua lógica de atualização real
+        return jsonify({"status": "ok", "id": id, "payload": data})
+    except Exception as e:
+        print("Erro ao processar PUT:", e)
+        return jsonify({"error": str(e)}), 500
+
+# -------------------------
+# Inicialização do Flask
+# -------------------------
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG)
     logging.debug(f"Tentando conectar ao banco: {DB_USER}@{DB_HOST}:{DB_NAME}")
