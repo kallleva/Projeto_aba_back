@@ -11,7 +11,7 @@ from .meta_terapeutica import MetaTerapeutica, StatusMetaEnum
 from .checklist_diario import ChecklistDiario
 from .usuario import Usuario, TipoUsuarioEnum
 from .formulario import Formulario
-from .pergunta import Pergunta
+from .pergunta import Pergunta, TipoPerguntaEnum
 from .checklist_respostas import ChecklistResposta
 from .checklist_diario import ChecklistDiario
 
@@ -30,6 +30,7 @@ __all__ = [
     'ChecklistDiario',      # <--- adicione esta linha
     'DiagnosticoEnum',
     'StatusMetaEnum',
-    'TipoUsuarioEnum'
+    'TipoUsuarioEnum',
+    'TipoPerguntaEnum'
 ]
 

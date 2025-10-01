@@ -20,7 +20,8 @@ class ChecklistResposta(db.Model):
             'pergunta_id': self.pergunta_id,
             'resposta': self.resposta,
             'resposta_calculada': self.resposta_calculada,
-            'pergunta': self.pergunta.to_dict() if self.pergunta else None
+            'pergunta': self.pergunta.to_dict() if self.pergunta else None,
+            'eh_formula': self.pergunta.tipo.value == 'FORMULA' if self.pergunta else False
         }
     
     def calcular_formula(self, respostas_dict):
