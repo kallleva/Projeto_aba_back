@@ -32,7 +32,8 @@ def criar_pergunta():
 
     pergunta = Pergunta(
         texto=dados["texto"],
-        tipo=tipo_enum
+        tipo=tipo_enum,
+        formula=dados.get("formula")
     )
     db.session.add(pergunta)
     db.session.commit()
@@ -51,6 +52,9 @@ def atualizar_pergunta(pergunta_id):
             pergunta.tipo = TIPO_MAP[dados["tipo"].lower()]
         except KeyError:
             return jsonify({"erro": f"Tipo inválido: {dados['tipo']}"}), 400
+
+    if "formula" in dados:
+        pergunta.formula = dados["formula"]
 
     db.session.commit()
     return jsonify(pergunta.to_dict()), 200

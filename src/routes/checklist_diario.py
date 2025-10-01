@@ -46,14 +46,10 @@ def criar_checklist():
         # Validações
         if not meta_id:
             return jsonify({'erro': 'ID da meta é obrigatório'}), 400
-        if nota is None:
-            return jsonify({'erro': 'Nota é obrigatória'}), 400
 
         meta = MetaTerapeutica.query.get(meta_id)
         if not meta:
             return jsonify({'erro': 'Meta terapêutica não encontrada'}), 404
-        if not ChecklistDiario.validar_nota(nota):
-            return jsonify({'erro': 'Nota deve ser um número inteiro entre 1 e 5'}), 400
 
         # Data
         data_checklist = date.today()
@@ -67,6 +63,15 @@ def criar_checklist():
         if ChecklistDiario.query.filter_by(meta_id=meta_id, data=data_checklist).first():
             return jsonify({'erro': 'Já existe um checklist para esta meta nesta data'}), 400
 
+        # Criar checklist temporário para validação
+        checklist_temp = ChecklistDiario(meta_id=meta_id, data=data_checklist, nota=nota, observacao=observacao)
+        checklist_temp.meta = meta  # Para poder usar o método de validação
+        
+        # Validar respostas obrigatórias
+        valido, mensagem = checklist_temp.validar_respostas(respostas_dict)
+        if not valido:
+            return jsonify({'erro': mensagem}), 400
+
         # Criar checklist
         checklist = ChecklistDiario(meta_id=meta_id, data=data_checklist, nota=nota, observacao=observacao)
 
@@ -74,7 +79,14 @@ def criar_checklist():
         for formulario in meta.formularios:
             for pergunta in formulario.perguntas:
                 resposta_texto = respostas_dict.get(str(pergunta.id), "")
-                checklist.respostas.append(ChecklistResposta(pergunta_id=pergunta.id, resposta=resposta_texto))
+                resposta_obj = ChecklistResposta(pergunta_id=pergunta.id, resposta=resposta_texto)
+                
+                # Calcular fórmula se for pergunta do tipo FORMULA
+                if pergunta.tipo.value == 'FORMULA':
+                    resposta_calculada = resposta_obj.calcular_formula(respostas_dict)
+                    resposta_obj.resposta_calculada = resposta_calculada
+                
+                checklist.respostas.append(resposta_obj)
 
         db.session.add(checklist)
         db.session.commit()
@@ -100,8 +112,6 @@ def atualizar_checklist(checklist_id):
             checklist.meta_id = meta.id
 
         if 'nota' in dados:
-            if not ChecklistDiario.validar_nota(dados['nota']):
-                return jsonify({'erro': 'Nota deve ser um número inteiro entre 1 e 5'}), 400
             checklist.nota = dados['nota']
 
         if 'observacao' in dados:
@@ -109,9 +119,19 @@ def atualizar_checklist(checklist_id):
 
         # Atualizar respostas
         respostas_dict = dados.get('respostas', {})
-        for resposta in checklist.respostas:
-            if str(resposta.pergunta_id) in respostas_dict:
-                resposta.resposta = respostas_dict[str(resposta.pergunta_id)]
+        if respostas_dict:
+            # Validar respostas obrigatórias
+            valido, mensagem = checklist.validar_respostas(respostas_dict)
+            if not valido:
+                return jsonify({'erro': mensagem}), 400
+            
+            for resposta in checklist.respostas:
+                if str(resposta.pergunta_id) in respostas_dict:
+                    resposta.resposta = respostas_dict[str(resposta.pergunta_id)]
+                    
+                    # Recalcular fórmula se for pergunta do tipo FORMULA
+                    if resposta.pergunta and resposta.pergunta.tipo.value == 'FORMULA':
+                        resposta.resposta_calculada = resposta.calcular_formula(respostas_dict)
 
         db.session.commit()
         return jsonify(checklist.to_dict()), 200

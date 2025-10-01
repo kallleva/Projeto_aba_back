@@ -110,6 +110,8 @@ def criar_formulario():
                   obrigatoria:
                     type: boolean
                     default: false
+                  formula:
+                    type: string
     responses:
       201:
         description: Formulário criado com sucesso
@@ -134,7 +136,8 @@ def criar_formulario():
             tipo=p.get("tipo", "texto"),
             obrigatoria=p.get("obrigatoria", False),
             ordem=i,
-            formulario_id=form.id
+            formulario_id=form.id,
+            formula=p.get("formula")
         )
         db.session.add(pergunta)
 
@@ -182,6 +185,8 @@ def atualizar_formulario(id):
                     type: string
                   obrigatoria:
                     type: boolean
+                  formula:
+                    type: string
     responses:
       200:
         description: Formulário atualizado com sucesso
@@ -205,6 +210,7 @@ def atualizar_formulario(id):
                 pergunta.tipo = p.get("tipo", "texto")
                 pergunta.obrigatoria = p.get("obrigatoria", False)
                 pergunta.ordem = i
+                pergunta.formula = p.get("formula")
         else:
             # Cria nova pergunta
             pergunta = Pergunta(
@@ -212,7 +218,8 @@ def atualizar_formulario(id):
                 tipo=p.get("tipo", "texto"),
                 obrigatoria=p.get("obrigatoria", False),
                 ordem=i,
-                formulario_id=form.id
+                formulario_id=form.id,
+                formula=p.get("formula")
             )
             db.session.add(pergunta)
 

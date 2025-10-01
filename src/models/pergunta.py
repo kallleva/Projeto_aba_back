@@ -7,6 +7,7 @@ class TipoPerguntaEnum(Enum):
     NUMERO = "NUMERO"
     BOOLEANO = "BOOLEANO"
     MULTIPLA = "MULTIPLA"
+    FORMULA = "FORMULA"
 
 class Pergunta(db.Model):
     __tablename__ = "perguntas"
@@ -17,6 +18,7 @@ class Pergunta(db.Model):
     obrigatoria = db.Column(db.Boolean, default=False)
     ordem = db.Column(db.Integer, nullable=False)
     formulario_id = db.Column(db.Integer, db.ForeignKey("formularios.id"), nullable=False)
+    formula = db.Column(db.Text, nullable=True)  # Campo para armazenar a fórmula
 
     def to_dict(self):
         return {
@@ -25,5 +27,6 @@ class Pergunta(db.Model):
             "tipo": self.tipo.value,  # retorna string maiúscula
             "obrigatoria": self.obrigatoria,
             "ordem": self.ordem,
-            "formulario_id": self.formulario_id
+            "formulario_id": self.formulario_id,
+            "formula": self.formula
         }
