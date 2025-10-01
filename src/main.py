@@ -16,6 +16,7 @@ from src.routes.relatorios import relatorios_bp
 from src.routes.auth import auth_bp
 from src.routes.pergunta import pergunta_bp
 from src.routes.formulario import formulario_bp
+from src.routes.agenda import agenda_bp
 
 # Forçar UTF-8 no stdout/stderr
 sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
@@ -71,7 +72,7 @@ swagger = Swagger(app, template={
 blueprints = [
     user_bp, paciente_bp, profissional_bp, plano_terapeutico_bp,
     meta_terapeutica_bp, checklist_diario_bp, relatorios_bp,
-    auth_bp, pergunta_bp, formulario_bp
+    auth_bp, pergunta_bp, formulario_bp, agenda_bp
 ]
 
 for bp in blueprints:

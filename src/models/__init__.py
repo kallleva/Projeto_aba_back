@@ -14,6 +14,7 @@ from .formulario import Formulario
 from .pergunta import Pergunta, TipoPerguntaEnum
 from .checklist_respostas import ChecklistResposta
 from .checklist_diario import ChecklistDiario
+from .agenda import Agenda, StatusAgendamentoEnum
 
 # Exportar para facilitar importações
 __all__ = [
@@ -28,8 +29,10 @@ __all__ = [
     'Pergunta',  
     'ChecklistResposta',
     'ChecklistDiario',      # <--- adicione esta linha
+    'Agenda',
     'DiagnosticoEnum',
     'StatusMetaEnum',
+    'StatusAgendamentoEnum',
     'TipoUsuarioEnum',
     'TipoPerguntaEnum'
 ]

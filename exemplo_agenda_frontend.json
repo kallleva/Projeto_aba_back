@@ -1,0 +1,211 @@
+{
+  "agendamentos": [
+    {
+      "id": 1,
+      "data_hora": "2024-01-15T14:00:00",
+      "duracao_minutos": 60,
+      "observacoes": "Primeira sessão de terapia",
+      "status": "AGENDADO",
+      "presente": null,
+      "paciente_id": 1,
+      "profissional_id": 1,
+      "paciente": {
+        "id": 1,
+        "nome": "João Silva",
+        "data_nascimento": "2010-05-15",
+        "responsavel": "Maria Silva",
+        "contato": "(11) 99999-9999",
+        "diagnostico": "TEA"
+      },
+      "profissional": {
+        "id": 1,
+        "nome": "Dr. Maria Santos",
+        "especialidade": "Psicologia",
+        "email": "maria@exemplo.com",
+        "telefone": "(11) 88888-8888"
+      }
+    },
+    {
+      "id": 2,
+      "data_hora": "2024-01-15T15:30:00",
+      "duracao_minutos": 45,
+      "observacoes": "Sessão de acompanhamento",
+      "status": "CONFIRMADO",
+      "presente": true,
+      "paciente_id": 2,
+      "profissional_id": 1,
+      "paciente": {
+        "id": 2,
+        "nome": "Ana Costa",
+        "data_nascimento": "2012-03-20",
+        "responsavel": "Pedro Costa",
+        "contato": "(11) 77777-7777",
+        "diagnostico": "TDAH"
+      },
+      "profissional": {
+        "id": 1,
+        "nome": "Dr. Maria Santos",
+        "especialidade": "Psicologia",
+        "email": "maria@exemplo.com",
+        "telefone": "(11) 88888-8888"
+      }
+    },
+    {
+      "id": 3,
+      "data_hora": "2024-01-16T09:00:00",
+      "duracao_minutos": 60,
+      "observacoes": "Avaliação inicial",
+      "status": "REALIZADO",
+      "presente": false,
+      "paciente_id": 3,
+      "profissional_id": 2,
+      "paciente": {
+        "id": 3,
+        "nome": "Carlos Oliveira",
+        "data_nascimento": "2008-12-10",
+        "responsavel": "Lucia Oliveira",
+        "contato": "(11) 66666-6666",
+        "diagnostico": "TEA"
+      },
+      "profissional": {
+        "id": 2,
+        "nome": "Dr. Roberto Lima",
+        "especialidade": "Terapia Ocupacional",
+        "email": "roberto@exemplo.com",
+        "telefone": "(11) 55555-5555"
+      }
+    }
+  ],
+  "agendamentos_por_mes": {
+    "2024": {
+      "1": [
+        {
+          "id": 1,
+          "data_hora": "2024-01-15T14:00:00",
+          "duracao_minutos": 60,
+          "status": "AGENDADO",
+          "paciente": {
+            "id": 1,
+            "nome": "João Silva"
+          },
+          "profissional": {
+            "id": 1,
+            "nome": "Dr. Maria Santos",
+            "especialidade": "Psicologia"
+          }
+        },
+        {
+          "id": 2,
+          "data_hora": "2024-01-15T15:30:00",
+          "duracao_minutos": 45,
+          "status": "CONFIRMADO",
+          "paciente": {
+            "id": 2,
+            "nome": "Ana Costa"
+          },
+          "profissional": {
+            "id": 1,
+            "nome": "Dr. Maria Santos",
+            "especialidade": "Psicologia"
+          }
+        },
+        {
+          "id": 3,
+          "data_hora": "2024-01-16T09:00:00",
+          "duracao_minutos": 60,
+          "status": "REALIZADO",
+          "paciente": {
+            "id": 3,
+            "nome": "Carlos Oliveira"
+          },
+          "profissional": {
+            "id": 2,
+            "nome": "Dr. Roberto Lima",
+            "especialidade": "Terapia Ocupacional"
+          }
+        }
+      ]
+    }
+  },
+  "agendamentos_por_dia": {
+    "2024-01-15": [
+      {
+        "id": 1,
+        "data_hora": "2024-01-15T14:00:00",
+        "duracao_minutos": 60,
+        "status": "AGENDADO",
+        "paciente": {
+          "id": 1,
+          "nome": "João Silva"
+        },
+        "profissional": {
+          "id": 1,
+          "nome": "Dr. Maria Santos",
+          "especialidade": "Psicologia"
+        }
+      },
+      {
+        "id": 2,
+        "data_hora": "2024-01-15T15:30:00",
+        "duracao_minutos": 45,
+        "status": "CONFIRMADO",
+        "paciente": {
+          "id": 2,
+          "nome": "Ana Costa"
+        },
+        "profissional": {
+          "id": 1,
+          "nome": "Dr. Maria Santos",
+          "especialidade": "Psicologia"
+        }
+      }
+    ]
+  },
+  "exemplo_criacao": {
+    "data_hora": "2024-01-20T10:00:00",
+    "duracao_minutos": 60,
+    "observacoes": "Sessão de avaliação",
+    "status": "AGENDADO",
+    "presente": null,
+    "paciente_id": 1,
+    "profissional_id": 1
+  },
+  "exemplo_atualizacao": {
+    "data_hora": "2024-01-20T11:00:00",
+    "duracao_minutos": 90,
+    "observacoes": "Sessão estendida para avaliação completa",
+    "status": "CONFIRMADO",
+    "presente": true
+  },
+  "exemplo_atualizacao_presenca": {
+    "presente": true
+  },
+  "exemplo_atualizacao_status": {
+    "status": "REALIZADO"
+  },
+  "filtros_exemplo": {
+    "por_profissional": "GET /api/agenda?profissional_id=1",
+    "por_paciente": "GET /api/agenda?paciente_id=1",
+    "por_status": "GET /api/agenda?status=AGENDADO",
+    "por_periodo": "GET /api/agenda?data_inicio=2024-01-01&data_fim=2024-01-31",
+    "por_mes": "GET /api/agenda/mes/2024/1?profissional_id=1",
+    "por_dia": "GET /api/agenda/dia/2024-01-15?profissional_id=1"
+  },
+  "status_disponiveis": [
+    "AGENDADO",
+    "CONFIRMADO", 
+    "CANCELADO",
+    "REALIZADO",
+    "FALTOU"
+  ],
+  "presenca_disponivel": [
+    true,
+    false,
+    null
+  ],
+  "descricao_presenca": {
+    "true": "Paciente presente",
+    "false": "Paciente ausente", 
+    "null": "Não informado"
+  }
+}
