@@ -1,0 +1,460 @@
+{
+  "exemplos_api_vinculos": {
+    "listar_vinculos": {
+      "url": "GET /api/vinculos",
+      "response": [
+        {
+          "id": 1,
+          "profissional": {
+            "id": 1,
+            "nome": "Dr. João Silva",
+            "especialidade": "Terapia ABA",
+            "email": "joao.silva@clinica.com",
+            "telefone": "(11) 99999-1111"
+          },
+          "paciente": {
+            "id": 1,
+            "nome": "Ana Clara Oliveira",
+            "data_nascimento": "2018-05-15",
+            "idade": 6,
+            "responsavel": "Carlos Oliveira",
+            "contato": "(11) 99999-4444",
+            "diagnostico": "TEA"
+          },
+          "data_inicio": "2024-09-02",
+          "data_fim": null,
+          "status": "ATIVO",
+          "tipo_atendimento": "Terapia ABA",
+          "frequencia_semanal": 3,
+          "duracao_sessao": 60,
+          "observacoes": "Paciente com boa evolução na comunicação",
+          "data_criacao": "2024-10-02",
+          "criado_por": 7
+        },
+        {
+          "id": 2,
+          "profissional": {
+            "id": 2,
+            "nome": "Dra. Maria Santos",
+            "especialidade": "Psicologia Comportamental",
+            "email": "maria.santos@clinica.com",
+            "telefone": "(11) 99999-2222"
+          },
+          "paciente": {
+            "id": 1,
+            "nome": "Ana Clara Oliveira",
+            "data_nascimento": "2018-05-15",
+            "idade": 6,
+            "responsavel": "Carlos Oliveira",
+            "contato": "(11) 99999-4444",
+            "diagnostico": "TEA"
+          },
+          "data_inicio": "2024-09-12",
+          "data_fim": null,
+          "status": "ATIVO",
+          "tipo_atendimento": "Psicologia",
+          "frequencia_semanal": 2,
+          "duracao_sessao": 45,
+          "observacoes": "Trabalho focado em habilidades sociais",
+          "data_criacao": "2024-10-02",
+          "criado_por": 7
+        }
+      ]
+    },
+    
+    "criar_vinculo": {
+      "url": "POST /api/vinculos",
+      "request": {
+        "profissional_id": 1,
+        "paciente_id": 2,
+        "tipo_atendimento": "Fonoaudiologia",
+        "data_inicio": "2024-10-15",
+        "frequencia_semanal": 2,
+        "duracao_sessao": 40,
+        "observacoes": "Foco no desenvolvimento da linguagem oral",
+        "criado_por": 7
+      },
+      "response": {
+        "id": 8,
+        "profissional": {
+          "id": 1,
+          "nome": "Dr. João Silva",
+          "especialidade": "Terapia ABA",
+          "email": "joao.silva@clinica.com",
+          "telefone": "(11) 99999-1111"
+        },
+        "paciente": {
+          "id": 2,
+          "nome": "Lucas Ferreira",
+          "data_nascimento": "2017-08-22",
+          "idade": 7,
+          "responsavel": "Sandra Ferreira",
+          "contato": "(11) 99999-5555",
+          "diagnostico": "TEA"
+        },
+        "data_inicio": "2024-10-15",
+        "data_fim": null,
+        "status": "ATIVO",
+        "tipo_atendimento": "Fonoaudiologia",
+        "frequencia_semanal": 2,
+        "duracao_sessao": 40,
+        "observacoes": "Foco no desenvolvimento da linguagem oral",
+        "data_criacao": "2024-10-02",
+        "criado_por": 7
+      }
+    },
+    
+    "atualizar_vinculo": {
+      "url": "PUT /api/vinculos/1",
+      "request": {
+        "frequencia_semanal": 4,
+        "duracao_sessao": 50,
+        "observacoes": "Aumentando frequência devido ao progresso positivo"
+      },
+      "response": {
+        "id": 1,
+        "profissional": {
+          "id": 1,
+          "nome": "Dr. João Silva",
+          "especialidade": "Terapia ABA",
+          "email": "joao.silva@clinica.com",
+          "telefone": "(11) 99999-1111"
+        },
+        "paciente": {
+          "id": 1,
+          "nome": "Ana Clara Oliveira",
+          "data_nascimento": "2018-05-15",
+          "idade": 6,
+          "responsavel": "Carlos Oliveira",
+          "contato": "(11) 99999-4444",
+          "diagnostico": "TEA"
+        },
+        "data_inicio": "2024-09-02",
+        "data_fim": null,
+        "status": "ATIVO",
+        "tipo_atendimento": "Terapia ABA",
+        "frequencia_semanal": 4,
+        "duracao_sessao": 50,
+        "observacoes": "Aumentando frequência devido ao progresso positivo",
+        "data_criacao": "2024-10-02",
+        "criado_por": 7
+      }
+    },
+    
+    "pacientes_do_profissional": {
+      "url": "GET /api/profissionais/1/pacientes",
+      "response": [
+        {
+          "id": 1,
+          "profissional": {
+            "id": 1,
+            "nome": "Dr. João Silva",
+            "especialidade": "Terapia ABA",
+            "email": "joao.silva@clinica.com",
+            "telefone": "(11) 99999-1111"
+          },
+          "paciente": {
+            "id": 1,
+            "nome": "Ana Clara Oliveira",
+            "data_nascimento": "2018-05-15",
+            "idade": 6,
+            "responsavel": "Carlos Oliveira",
+            "contato": "(11) 99999-4444",
+            "diagnostico": "TEA"
+          },
+          "data_inicio": "2024-09-02",
+          "data_fim": null,
+          "status": "ATIVO",
+          "tipo_atendimento": "Terapia ABA",
+          "frequencia_semanal": 3,
+          "duracao_sessao": 60,
+          "observacoes": "Paciente com boa evolução na comunicação",
+          "data_criacao": "2024-10-02",
+          "criado_por": 7
+        },
+        {
+          "id": 5,
+          "profissional": {
+            "id": 1,
+            "nome": "Dr. João Silva",
+            "especialidade": "Terapia ABA",
+            "email": "joao.silva@clinica.com",
+            "telefone": "(11) 99999-1111"
+          },
+          "paciente": {
+            "id": 3,
+            "nome": "Sophia Rodrigues",
+            "data_nascimento": "2019-03-10",
+            "idade": 5,
+            "responsavel": "Roberto Rodrigues",
+            "contato": "(11) 99999-6666",
+            "diagnostico": "TEA"
+          },
+          "data_inicio": "2024-09-22",
+          "data_fim": null,
+          "status": "ATIVO",
+          "tipo_atendimento": "Terapia ABA",
+          "frequencia_semanal": 4,
+          "duracao_sessao": 45,
+          "observacoes": "Paciente iniciante, adaptação ao ambiente",
+          "data_criacao": "2024-10-02",
+          "criado_por": 7
+        }
+      ]
+    },
+    
+    "profissionais_do_paciente": {
+      "url": "GET /api/pacientes/1/profissionais",
+      "response": [
+        {
+          "id": 1,
+          "profissional": {
+            "id": 1,
+            "nome": "Dr. João Silva",
+            "especialidade": "Terapia ABA",
+            "email": "joao.silva@clinica.com",
+            "telefone": "(11) 99999-1111"
+          },
+          "paciente": {
+            "id": 1,
+            "nome": "Ana Clara Oliveira",
+            "data_nascimento": "2018-05-15",
+            "idade": 6,
+            "responsavel": "Carlos Oliveira",
+            "contato": "(11) 99999-4444",
+            "diagnostico": "TEA"
+          },
+          "data_inicio": "2024-09-02",
+          "data_fim": null,
+          "status": "ATIVO",
+          "tipo_atendimento": "Terapia ABA",
+          "frequencia_semanal": 3,
+          "duracao_sessao": 60,
+          "observacoes": "Paciente com boa evolução na comunicação",
+          "data_criacao": "2024-10-02",
+          "criado_por": 7
+        },
+        {
+          "id": 2,
+          "profissional": {
+            "id": 2,
+            "nome": "Dra. Maria Santos",
+            "especialidade": "Psicologia Comportamental",
+            "email": "maria.santos@clinica.com",
+            "telefone": "(11) 99999-2222"
+          },
+          "paciente": {
+            "id": 1,
+            "nome": "Ana Clara Oliveira",
+            "data_nascimento": "2018-05-15",
+            "idade": 6,
+            "responsavel": "Carlos Oliveira",
+            "contato": "(11) 99999-4444",
+            "diagnostico": "TEA"
+          },
+          "data_inicio": "2024-09-12",
+          "data_fim": null,
+          "status": "ATIVO",
+          "tipo_atendimento": "Psicologia",
+          "frequencia_semanal": 2,
+          "duracao_sessao": 45,
+          "observacoes": "Trabalho focado em habilidades sociais",
+          "data_criacao": "2024-10-02",
+          "criado_por": 7
+        }
+      ]
+    }
+  },
+  
+  "exemplos_frontend": {
+    "formulario_criar_vinculo": {
+      "campos_obrigatorios": {
+        "profissional_id": {
+          "tipo": "select",
+          "opcoes_exemplo": [
+            {"value": 1, "label": "Dr. João Silva - Terapia ABA"},
+            {"value": 2, "label": "Dra. Maria Santos - Psicologia"},
+            {"value": 3, "label": "Dr. Pedro Costa - Fonoaudiologia"}
+          ]
+        },
+        "paciente_id": {
+          "tipo": "select",
+          "opcoes_exemplo": [
+            {"value": 1, "label": "Ana Clara Oliveira (6 anos)"},
+            {"value": 2, "label": "Lucas Ferreira (7 anos)"},
+            {"value": 3, "label": "Sophia Rodrigues (5 anos)"}
+          ]
+        },
+        "tipo_atendimento": {
+          "tipo": "select",
+          "opcoes": [
+            "Terapia ABA",
+            "Psicologia",
+            "Fonoaudiologia",
+            "Terapia Ocupacional",
+            "Fisioterapia",
+            "Psicopedagogia",
+            "Outro"
+          ]
+        }
+      },
+      "campos_opcionais": {
+        "data_inicio": {
+          "tipo": "date",
+          "default": "data_atual"
+        },
+        "frequencia_semanal": {
+          "tipo": "number",
+          "min": 1,
+          "max": 7,
+          "default": 2
+        },
+        "duracao_sessao": {
+          "tipo": "number",
+          "min": 15,
+          "max": 180,
+          "step": 15,
+          "default": 45
+        },
+        "observacoes": {
+          "tipo": "textarea",
+          "placeholder": "Observações sobre o atendimento..."
+        }
+      }
+    },
+    
+    "card_vinculo": {
+      "estrutura": {
+        "cabecalho": {
+          "nome_profissional": "Dr. João Silva",
+          "especialidade": "Terapia ABA",
+          "status_badge": "ATIVO"
+        },
+        "corpo": {
+          "tipo_atendimento": "Terapia ABA",
+          "frequencia": "3x por semana",
+          "duracao": "60 minutos",
+          "data_inicio": "02/09/2024",
+          "observacoes": "Paciente com boa evolução..."
+        },
+        "acoes": [
+          {"label": "Editar", "action": "editarVinculo"},
+          {"label": "Suspender", "action": "suspenderVinculo"},
+          {"label": "Inativar", "action": "inativarVinculo"}
+        ]
+      }
+    },
+    
+    "dashboard_profissional": {
+      "estatisticas": {
+        "total_pacientes": 15,
+        "pacientes_ativos": 12,
+        "sessoes_semana": 34,
+        "tipos_atendimento": {
+          "Terapia ABA": 8,
+          "Psicologia": 4,
+          "Fonoaudiologia": 3
+        }
+      },
+      "pacientes_recentes": [
+        {
+          "id": 1,
+          "nome": "Ana Clara",
+          "ultima_sessao": "2024-10-01",
+          "proxima_sessao": "2024-10-03",
+          "status": "Em dia"
+        }
+      ]
+    },
+    
+    "filtros_vinculos": {
+      "status": {
+        "opcoes": ["ATIVO", "INATIVO", "SUSPENSO"],
+        "default": "ATIVO"
+      },
+      "tipo_atendimento": {
+        "opcoes": [
+          "Terapia ABA",
+          "Psicologia", 
+          "Fonoaudiologia",
+          "Terapia Ocupacional",
+          "Fisioterapia",
+          "Psicopedagogia",
+          "Outro"
+        ]
+      },
+      "periodo": {
+        "data_inicio": "2024-01-01",
+        "data_fim": "2024-12-31"
+      }
+    }
+  },
+  
+  "estados_componentes": {
+    "loading": {
+      "vinculos": [],
+      "loading": true,
+      "error": null
+    },
+    "success": {
+      "vinculos": [
+        {
+          "id": 1,
+          "profissional": {"nome": "Dr. João Silva"},
+          "paciente": {"nome": "Ana Clara"},
+          "status": "ATIVO"
+        }
+      ],
+      "loading": false,
+      "error": null
+    },
+    "error": {
+      "vinculos": [],
+      "loading": false,
+      "error": "Erro ao carregar vínculos"
+    }
+  },
+  
+  "validacoes_frontend": {
+    "criar_vinculo": {
+      "profissional_id": "required|integer",
+      "paciente_id": "required|integer",
+      "tipo_atendimento": "required|in:Terapia ABA,Psicologia,Fonoaudiologia,Terapia Ocupacional,Fisioterapia,Psicopedagogia,Outro",
+      "data_inicio": "date",
+      "frequencia_semanal": "integer|min:1|max:7",
+      "duracao_sessao": "integer|min:15|max:180"
+    },
+    "mensagens_erro": {
+      "profissional_required": "Selecione um profissional",
+      "paciente_required": "Selecione um paciente",
+      "tipo_atendimento_required": "Selecione o tipo de atendimento",
+      "vinculo_duplicado": "Já existe um vínculo ativo deste tipo entre o profissional e paciente",
+      "frequencia_invalida": "Frequência deve ser entre 1 e 7 sessões por semana",
+      "duracao_invalida": "Duração deve ser entre 15 e 180 minutos"
+    }
+  },
+  
+  "notificacoes": {
+    "vinculo_criado": {
+      "tipo": "success",
+      "titulo": "Vínculo criado!",
+      "mensagem": "O vínculo entre {profissional} e {paciente} foi criado com sucesso."
+    },
+    "vinculo_atualizado": {
+      "tipo": "success", 
+      "titulo": "Vínculo atualizado!",
+      "mensagem": "As informações do vínculo foram atualizadas."
+    },
+    "vinculo_inativado": {
+      "tipo": "info",
+      "titulo": "Vínculo inativado",
+      "mensagem": "O vínculo foi encerrado em {data}."
+    },
+    "erro_generico": {
+      "tipo": "error",
+      "titulo": "Erro",
+      "mensagem": "Ocorreu um erro. Tente novamente."
+    }
+  }
+}
+

@@ -5,10 +5,30 @@ import logging
 from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS
 from flasgger import Swagger
+
+# -------------------------
+# Forçar UTF-8 no stdout/stderr
+# -------------------------
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+
+# -------------------------
+# Corrigir path para imports
+# -------------------------
+# Adiciona a pasta raiz do projeto ao sys.path
+# Assim podemos importar src.models, src.routes, etc.
+current_dir = os.path.dirname(os.path.abspath(__file__))
+project_root = os.path.abspath(os.path.join(current_dir, ".."))
+sys.path.insert(0, project_root)
+
+# -------------------------
+# Agora os imports funcionam
+# -------------------------
 from src.models import db
 from src.routes.user import user_bp
 from src.routes.paciente import paciente_bp
 from src.routes.profissional import profissional_bp
+from src.routes.profissional_paciente import profissional_paciente_bp
 from src.routes.plano_terapeutico import plano_terapeutico_bp
 from src.routes.meta_terapeutica import meta_terapeutica_bp
 from src.routes.checklist_diario import checklist_diario_bp
@@ -18,15 +38,10 @@ from src.routes.pergunta import pergunta_bp
 from src.routes.formulario import formulario_bp
 from src.routes.agenda import agenda_bp
 
-# Forçar UTF-8 no stdout/stderr
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
-
-# Adicionar diretório raiz ao sys.path
-sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
-
+# -------------------------
 # Inicialização do Flask
-app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
+# -------------------------
+app = Flask(__name__, static_folder=os.path.join(current_dir, 'static'))
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'asdf#FGSgvasgf$5$WGT')
 
 # -------------------------
@@ -42,12 +57,13 @@ CORS(
 # -------------------------
 # Configuração do banco PostgreSQL
 # -------------------------
-DB_USER = os.environ.get('DB_USER', 'postgres')
-DB_PASS = os.environ.get('DB_PASS', 'postgres')
-DB_NAME = os.environ.get('DB_NAME', 'aba_postgres')
-DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_USER = os.environ.get("DB_USER", "aba_user")
+DB_PASS = os.environ.get("DB_PASS", "aba_pass123")
+DB_NAME = os.environ.get("DB_NAME", "aba_postgres")
+DB_HOST = os.environ.get("DB_HOST", "db")
+DB_PORT = os.environ.get("DB_PORT", "5432")
 
-app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:5432/{DB_NAME}"
+app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql+psycopg2://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inicializa SQLAlchemy
@@ -70,23 +86,28 @@ swagger = Swagger(app, template={
 # Registrar Blueprints
 # -------------------------
 blueprints = [
-    user_bp, paciente_bp, profissional_bp, plano_terapeutico_bp,
-    meta_terapeutica_bp, checklist_diario_bp, relatorios_bp,
-    auth_bp, pergunta_bp, formulario_bp, agenda_bp
+    user_bp, paciente_bp, profissional_bp, profissional_paciente_bp,
+    plano_terapeutico_bp, meta_terapeutica_bp, checklist_diario_bp,
+    relatorios_bp, auth_bp, pergunta_bp, formulario_bp, agenda_bp
 ]
 
 for bp in blueprints:
     app.register_blueprint(bp, url_prefix='/api')
 
 # -------------------------
-# Criar tabelas (apenas em desenvolvimento)
+# Criar tabelas e popular dados iniciais
 # -------------------------
 with app.app_context():
     try:
         db.create_all()
-        print("Tabelas criadas com sucesso.")
+        print("✅ Tabelas criadas com sucesso.")
+
+        # Executar seed data se necessário
+        from src.database.seed_data import create_seed_data
+        create_seed_data()
+
     except Exception as e:
-        print("Erro ao criar tabelas:", e)
+        print("❌ Erro ao inicializar banco de dados:", e)
 
 # -------------------------
 # Rota de teste
@@ -103,14 +124,14 @@ def hello():
 def serve(path):
     static_folder = app.static_folder
     requested_path = os.path.join(static_folder, path)
-    
+
     if path != "" and os.path.exists(requested_path):
         return send_from_directory(static_folder, path)
-    
+
     index_path = os.path.join(static_folder, 'index.html')
     if os.path.exists(index_path):
         return send_from_directory(static_folder, 'index.html')
-    
+
     return "index.html not found", 404
 
 # -------------------------
@@ -121,7 +142,6 @@ def test_put(id):
     try:
         data = request.json
         print(f"Payload recebido para update {id}: {data}")
-        # Aqui você pode chamar sua lógica de atualização real
         return jsonify({"status": "ok", "id": id, "payload": data})
     except Exception as e:
         print("Erro ao processar PUT:", e)

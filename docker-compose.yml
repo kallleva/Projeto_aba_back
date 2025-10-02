@@ -14,6 +14,41 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aba_user -d aba_postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: aba_app
+    restart: always
+    environment:
+      DB_USER: aba_user
+      DB_PASS: aba_pass123
+      DB_NAME: aba_postgres
+      DB_HOST: db
+      SECRET_KEY: "sua_chave_secreta_aqui_123"
+    ports:
+      - "5000:5000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./src:/app/src
+      - ./migrations:/app/migrations
+      - ./alembic.ini:/app/alembic.ini
+
+    command: >
+      sh -c "
+        echo '🚀 Aguardando banco de dados...' &&
+        until pg_isready -h db -U aba_user -d aba_postgres; do sleep 2; done &&
+        python init_db_simple.py &&
+        echo '🎯 Iniciando aplicação Flask...' &&
+        python src/main.py
+      "
+
 
 volumes:
   pgdata:

@@ -6,6 +6,7 @@ db = SQLAlchemy()
 # Importar todos os modelos
 from .paciente import Paciente, DiagnosticoEnum
 from .profissional import Profissional
+from .profissional_paciente import ProfissionalPaciente, StatusVinculoEnum, TipoAtendimentoEnum
 from .plano_terapeutico import PlanoTerapeutico
 from .meta_terapeutica import MetaTerapeutica, StatusMetaEnum
 from .checklist_diario import ChecklistDiario
@@ -20,7 +21,8 @@ from .agenda import Agenda, StatusAgendamentoEnum
 __all__ = [
     'db',
     'Paciente',
-    'Profissional', 
+    'Profissional',
+    'ProfissionalPaciente',
     'PlanoTerapeutico',
     'MetaTerapeutica',
     'ChecklistDiario',
@@ -28,11 +30,13 @@ __all__ = [
     'Formulario',     
     'Pergunta',  
     'ChecklistResposta',
-    'ChecklistDiario',      # <--- adicione esta linha
+    'ChecklistDiario',
     'Agenda',
     'DiagnosticoEnum',
     'StatusMetaEnum',
     'StatusAgendamentoEnum',
+    'StatusVinculoEnum',
+    'TipoAtendimentoEnum',
     'TipoUsuarioEnum',
     'TipoPerguntaEnum'
 ]
